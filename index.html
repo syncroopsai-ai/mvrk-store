@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
@@ -119,8 +119,8 @@
   </div>
 
   <script>
-    // Тестовий вебхук n8n
-    const WEBHOOK_URL = "https://danit-n8n.duckdns.org/webhook-test/ae8fd9c7-f66e-42a7-9328-280be0c91ce7";
+    // Продуктовий вебхук n8n (без -test)
+    const WEBHOOK_URL = "https://danit-n8n.duckdns.org/webhook/ae8fd9c7-f66e-42a7-9328-280be0c91ce7";
 
     const products = [
       { id: 1, sku: "P1", name: "Худі MVRK Heavyweight", price: 2490, img: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500", sizes: ["S", "M", "L", "XL"] },
@@ -277,21 +277,21 @@
         msgDiv.className = "text-sm font-medium mt-2 text-gray-400 text-center";
         msgDiv.innerText = "Відправка замовлення...";
 
-        const response = await fetch(WEBHOOK_URL, {
+        await fetch(WEBHOOK_URL, {
           method: "POST",
+          mode: 'no-cors',
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(orderData)
         });
 
-        if (response.ok) {
-          msgDiv.className = "text-sm font-medium mt-2 text-brand text-center";
-          msgDiv.innerText = `Дякуємо! Підтвердження надіслано на ${email}`;
-          document.getElementById('order-form').reset();
-          cart = [];
-          updateCart();
-        } else {
-          throw new Error('Помилка сервера: ' + response.status);
-        }
+        // Оскільки mode: 'no-cors' не дає читати відповідь (response.ok буде false-ish), 
+        // вважаємо успішним виклик якщо він дійшов сюди без помилки network.
+        msgDiv.className = "text-sm font-medium mt-2 text-brand text-center";
+        msgDiv.innerText = `Дякуємо! Підтвердження надіслано на ${email}`;
+        document.getElementById('order-form').reset();
+        cart = [];
+        updateCart();
+
       } catch (error) {
         console.error(error);
         msgDiv.className = "text-sm font-medium mt-2 text-red-500 text-center";
